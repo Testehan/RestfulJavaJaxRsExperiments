@@ -1,0 +1,774 @@
+        RESTful Java with JAX-RS 2.0 - Designing and Developing distributed webservices
+
+Introduction/Preface
+
+REST is an architectural style that defines a set of constraints that, when applied to the
+architecture of a distributed system, induce desirable properties like loose coupling and
+horizontal scalability. RESTful web services are the result of applying these constraints
+to services that utilize web standards such as URIs, HTTP, XML, and JSON. Such serv‐
+ices become part of the fabric of the Web and can take advantage of years of web engi‐
+neering to satisfy their clients’ needs.
+
+The Java API for RESTful web services (JAX-RS) is a new API that aims to make
+development of RESTful web services in Java simple and intuitive. The initial impetus
+for the API came from the observation that existing Java Web APIs were generally either:
+    • Very low level, leaving the developer to do a lot of repetitive and error-prone work
+    such as URI parsing and content negotiation, or
+    • Rather high level and proscriptive, making it easy to build services that conform to
+    a particular pattern but lacking the necessary flexibility to tackle more general
+    problems.
+
+JAX-RS is one of the latest generations of Java APIs that make use of Java annotations
+to reduce the need for standard base classes, implementing required interfaces, and outof-band configuration files.
+
+!!!!
+Annotations are used to route client requests to matching Java class methods and declaratively map request data to
+the parameters of those methods.
+
+Bill Burke led the development of one of the JAX-RS implementations mentioned earlier
+(RESTEasy) and was an active and attentive member of the expert group.
+
+This book, RESTful Java with JAX-RS 2.0, provides an in-depth tutorial on JAX-RS and
+shows how to get the most from this new API while adhering to the REST architectural
+style. I hope you enjoy the book and working with JAX-RS.
+
+
+Who Should Read This Book
+    This book teaches you how to design and develop distributed web services in Java using
+    RESTful architectural principles on top of the HTTP protocol. It is mostly a compre‐
+    hensive reference guide on the JAX-RS specification, which is a JCP standardized an‐
+    notation framework for writing RESTful web services in Java.
+
+    While this book does go into many of the fundamentals of REST, it does not cover them
+    all and focuses more on implementation rather than theory. You can satisfy your craving
+    for more RESTful theory by obtaining RESTful Web Services by Leonard Richardson
+    and Sam Ruby (O’Reilly). If you are familiar with writing Java EE applications, you will
+    be very comfortable reading this book
+
+    Before reading this book, you should also be fairly fluent in the Java language and
+    specifically know how to use and apply Java annotations
+
+How This Book Is Organized  !!!!
+    This book is organized into two parts: the technical manuscript, followed by the JAXRS workbook.
+    The technical manuscript explains what REST and JAX-RS are, how they
+    work, and when to use them. The JAX-RS workbook provides step-by-step instructions
+    for installing, configuring, and running the JAX-RS examples from the manuscript with
+    the JBoss RESTEasy framework, an implementation of JAX-RS.
+
+
+===============================================================================================================
+===============================================================================================================
+Part 1 - REST and the JAX-RS Standard
+
+===============================================================================================================
+CHAPTER 1 - Introduction to REST
+
+    Really, most of us take the Web for granted. Have you, as a programmer, sat down and
+    tried to understand why the Web has been so successful? How has it grown from a simple
+    network of researchers and academics to an interconnected worldwide community?
+    What properties of the Web make it so viral?
+
+    One man, Roy Fielding, did ask these questions in his doctoral thesis, “Architectural
+    Styles and the Design of Network-based Software Architectures.”
+    In it, he identifies specific architectural principles that answer the following questions:
+        • Why is the Web so prevalent and ubiquitous?
+        • What makes the Web scale?
+        • How can I apply the architecture of the Web to my own applications?
+
+!!!!!
+    The set of these architectural principles is called REpresentational State Transfer (REST)
+    and is defined as:
+        Addressable resources
+            The key abstraction of information and data in REST is a resource, and each re‐
+            source must be addressable via a URI (Uniform Resource Identifier).
+        A uniform, constrained interface
+            Use a small set of well-defined methods to manipulate your resources.
+        Representation-oriented
+            You interact with services using representations of that service. A resource refer‐
+            enced by one URI can have different formats. Different platforms need different
+            formats. For example, browsers need HTML, JavaScript needs JSON (JavaScript
+            Object Notation), and a Java application may need XML.
+        Communicate statelessly
+            Stateless applications are easier to scale.
+        Hypermedia As The Engine Of Application State (HATEOAS)
+            Let your data formats drive state transitions in your applications.
+
+    For a PhD thesis, Fielding’s paper is actually very readable and, thankfully, not very long.
+    It, along with Leonard Richardson and Sam Ruby’s book RESTful Web APIs (O’Reilly),
+    is an excellent reference for understanding REST
+
+
+    REST and the Rebirth of HTTP
+        REST isn’t protocol-specific, but when people talk about REST, they usually mean REST over HTTP.
+
+ !!     Browser-based web applications see only a tiny fraction of the features of HTTP
+
+ !!     HTTP is actually a very rich application protocol that provides a multitude of interesting and useful
+        capabilities for application developers. You will need a good understanding of HTTP in order to write
+        RESTful web services.
+
+        HTTP is a synchronous request/response-based application network protocol used for
+        distributed, collaborative, document-based systems. It is the primary protocol used on the Web
+
+         The protocol is very simple: the client sends a request message made up of
+         the HTTP method being invoked, the location of the resource you are interested in
+         invoking, a variable set of headers, and an optional message body that can basically be
+         anything you want, including HTML, plain text, XML, JSON, and even binary data.
+
+        Here’s an example:
+            GET /resteasy HTTP/1.1
+            Host: jboss.org
+            User-Agent: Mozilla/5.0
+            Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+            Accept-Language: en-us,en;q=0.5
+            Accept-Encoding: gzip,deflate
+
+        Here’s the message the server might respond with using the previous GET query:
+            HTTP/1.1 200 OK
+            X-Powered-By: Servlet 2.4; JBoss-4.2.2.GA
+            Content-Type: text/html
+            <head>
+            <title>JBoss RESTEasy Project</title>
+            </head>
+            <body>
+            <h1>JBoss RESTEasy</h1>
+            <p>JBoss RESTEasy is an open source implementation of the JAX-RS specification...
+
+
+    RESTful Architectural Principles
+        programmers started to realize that they could use the concepts of REST to build dis‐
+        tributed services and model service-oriented architectures (SOAs).
+
+        The idea of SOA is that application developers design their systems as a set of reusable,
+        decoupled, distributed services. Since these services are published on the network, con‐
+        ceptually, it should be easier to compose larger and more complex systems. SOA has
+        been around for a long time. Developers have used technologies like DCE, CORBA, and
+        Java RMI to build them in the past. Nowadays, though, when you think of SOA, you
+        think of SOAP-based web services.
+
+        While REST has many similarities to the more traditional ways of writing SOA appli‐
+        cations, it is very different in many important ways. You would think that a background
+        in distributed computing would be an asset to understanding this new way of creating
+        web services, but unfortunately this is not always the case. The reason is that some of
+        the concepts of REST are hard to swallow, especially if you have written successful SOAP
+        or CORBA applications. If your career has a foundation in one of these older technol‐
+        ogies, there’s a bit of emotional baggage you will have to overcome.
+
+        Let’s examine each of the architectural principles of REST in detail and why they are
+        important when you are writing a web service:
+
+
+    1.Addressability
+        Addressability is the idea that every object and resource in your system is reachable
+        through a unique identifier.
+
+ !!!    In the REST world, addressability is managed through the use of URIs. When you make
+        a request for information in your browser, you are typing in a URI. Each HTTP request
+        must contain the URI of the object you are requesting information from or posting
+        information to. The format of a URI is standardized as follows:
+
+            scheme://host:port/path?queryString#fragment
+
+        The scheme is the protocol you are using to communicate with. For RESTful web serv‐
+        ices, it is usually http or https. The host is a DNS name or IP address. It is followed
+        by an optional port, which is numeric. The host and port represent the location of
+        your resource on the network. Following host and port is a path expression. This path
+        expression is a set of text segments delimited by the “/” character. Think of the path
+        expression as a directory list of a file on your machine
+
+        Following the path expression is an optional query string. The “?” character separates the path from the
+        query string.
+        The query string is a list of parameters represented as name/value pairs. Each pair is
+        delimited with the “&” character. Here’s an example query string within a URI:
+
+            http://example.com/customers?lastName=Burke&zipcode=02115
+
+        The last part of the URI is the fragment. It is delimited by a “#” character. The fragment
+        is usually used to point to a certain place in the document you are querying.
+
+ !!     Not all characters are allowed within a URI string. Some characters must be encoded
+        using the following rules. The characters a–z, A–Z, 0–9, ., -, *, and _ remain the same.
+        The space character is converted to +. The other characters are first converted into a
+        sequence of bytes using a specific encoding scheme. Next, a two-digit hexadecimal
+        number prefixed by % represents each byte.
+
+        Using a unique URI to identify each of your services makes each of your resources
+        linkable. Service references can be embedded in documents or even email messages.
+        For instance, consider the situation where somebody calls your company’s help desk
+        with a problem related to your SOA application. A link could represent the exact prob‐
+        lem the user is having. Customer support can email the link to a developer who can fix
+        the problem
+
+
+    2.The Uniform, Constrained Interface
+        The idea behind it is that you stick to the finite set of operations of the application protocol you’re
+        distributing your services upon.
+        This means that you don’t have an “action” parameter in your URI and use only the
+        methods of HTTP for your web services. HTTP has a small, fixed set of operational methods. Each method has a
+        specific purpose and meaning.
+
+            GET
+                GET is a read-only operation. It is used to query the server for specific information.
+                It is both an idempotent and safe operation. Idempotent means that no matter how
+                many times you apply the operation, the result is always the same. The act of reading
+                an HTML document shouldn’t change the document. Safe means that invoking a
+                GET does not change the state of the server at all. This means that, other than request
+                load, the operation will not affect the server.
+
+            PUT
+                PUT requests that the server store the message body sent with the request under
+                the location provided in the HTTP message. It is usually modeled as an insert or
+                update. It is also idempotent. When using PUT, the client knows the identity of the
+                resource it is creating or updating. It is idempotent because sending the same PUT
+                message more than once has no effect on the underlying service. An analogy is an
+                MS Word document that you are editing. No matter how many times you click the
+                Save button, the file that stores your document will logically be the same document
+
+            DELETE
+                DELETE is used to remove resources. It is idempotent as well.
+
+            POST
+                POST is the only nonidempotent and unsafe operation of HTTP. Each POST meth‐
+                od is allowed to modify the service in a unique way. You may or may not send
+                information with the request. You may or may not receive information from the response.
+
+            HEAD
+                HEAD is exactly like GET except that instead of returning a response body, it re‐
+                turns only a response code and any headers associated with the request.
+
+            OPTIONS
+                OPTIONS is used to request information about the communication options of the
+                resource you are interested in. It allows the client to determine the capabilities of a
+                server and a resource without triggering any resource action or retrieval.
+
+        Constraining the interface for your web services has many more advantages than dis‐
+        advantages. Let’s look at a few:
+            Familiarity
+                If you have a URI that points to a service, you know exactly which methods are
+                available on that resource. You don’t need an IDL-like file describing which methods
+                are available. You don’t need stubs. All you need is an HTTP client library. If you
+                have a document that is composed of links to data provided by many different
+                services, you already know which method to call to pull in data from those links.
+
+            Interoperability
+                HTTP is a very ubiquitous protocol. Most programming languages have an HTTP
+                client library available to them. So, if your web service is exposed over HTTP, there
+                is a very high probability that people who want to use your service will be able to
+                do so without any additional requirements beyond being able to exchange the data
+                formats the service is expecting. With CORBA or SOAP, you have to install vendor specific client
+                libraries as well as loads and loads of IDL- or WSDL-generated stub code.
+
+                With REST over HTTP, you don’t have to worry about either of these
+                things and can just focus on understanding the data format of the service. I like to
+                think that you are focusing on what is really important: application interoperability, rather
+                than vendor interoperability.
+
+            Scalability
+                Because REST constrains you to a well-defined set of methods, you have predictable
+                behavior that can have incredible performance benefits. GET is the strongest ex‐
+                ample. When surfing the Internet, have you noticed that the second time you browse
+                to a specific page it comes up faster? This is because your browser caches already
+                visited pages and images. HTTP has a fairly rich and configurable protocol for
+                defining caching semantics. Because GET is a read method that is both idempotent
+                and safe, browsers and HTTP proxies can cache responses to servers, and this can
+                save a huge amount of network traffic and hits to your website
+
+
+    3.Representation-Oriented
+        The third architectural principle of REST is that your services should be representationoriented.
+        Each service is addressable through a specific URI and representations are
+        exchanged between the client and service. With a GET operation, you are receiving a
+        representation of the current state of that resource. A PUT or POST passes a represen‐
+        tation of the resource to the server so that the underlying resource’s state can change.
+
+        These representations could be XML, JSON, YAML, or really any format you can come up with.
+
+        HTTP uses the Content-Type header to tell the client or server what data format it is receiving.
+        The Content-Type header value string is in the Multipurpose Internet Mail Extension (MIME) format
+
+        The MIME format is very simple:
+            type/subtype;name=value;name=value...
+        type is the main format family and subtype is a category. Optionally, the MIME type
+        can have a set of name/value pair properties delimited by the “;” character. Some examples are:
+            text/plain
+            text/html
+            application/xml
+            text/html; charset=iso-8859-1
+
+ !!!!   While not used very much by your browser, HTTP content negotiation is a very pow‐
+        erful tool when you’re writing web services. With the Accept header, a client can list its
+        preferred response formats. Ajax clients can ask for JSON, Java for XML, Ruby for
+        YAML. Another thing this is very useful for is versioning of services. The same service
+        can be available through the same URI with the same methods (GET, POST, etc.), and
+        all that changes is the MIME type. For example, the MIME type could be application/
+        vnd+xml for an old service, while newer services could exchange application/vnd
+        +xml;version=1.1 MIME types
+
+        All in all, because REST and HTTP have a layered approach to addressability, method
+        choice, and data format, you have a much more decoupled protocol that allows your
+        service to interact with a wide variety of clients in a consistent way.
+
+
+    4.Communicate Statelessly
+!!!!!   The fourth RESTful principle I will discuss is the idea of statelessness. When I talk about
+        statelessness, though, I don’t mean that your applications can’t have state. In REST,
+        stateless means that there is no client session data stored on the server. The server only
+        records and manages the state of the resources it exposes. If there needs to be session specific data, it
+        should be held and maintained by the client and transferred to the server
+        with each request as needed. A service layer that does not have to maintain client sessions
+        is a lot easier to scale, as it has to do a lot fewer expensive replications in a clustered
+        environment. It’s a lot easier to scale up because all you have to do is add machines.
+
+!!!     A world without server-maintained session data isn’t so hard to imagine if you look
+        back 12–15 years ago. Back then, many distributed applications had a fat GUI client
+        written in Visual Basic, Power Builder, or Visual C++ talking RPCs to a middle tier that
+        sat in front of a database. The server was stateless and just processed data. The fat client
+        held all session state. The problem with this architecture was an IT operations one. It
+        was very hard for operations to upgrade, patch, and maintain client GUIs in large en‐
+        vironments. Web applications solved this problem because the applications could be
+        delivered from a central server and rendered by the browser. We started maintaining
+        client sessions on the server because of the limitations of the browser. Around 2008, in
+        step with the growing popularity of Ajax, Flex, and Java FX, the browsers became so‐
+        phisticated enough to maintain their own session state like their fat-client counterparts
+        in the mid-’90s used to do. We can now go back to that stateless scalable middle tier that
+        we enjoyed in the past. It’s funny how things go full circle sometimes
+
+
+    5. HATEOAS
+        The final principle of REST is the idea of using Hypermedia As The Engine Of Appli‐
+        cation State (HATEOAS). Hypermedia is a document-centric approach with added
+        support for embedding links to other services and information within that document format.
+
+            <order id="111">
+             <customer>http://customers.myintranet.com/customers/32133</customer>
+             <order-entries>
+              <order-entry>
+              <quantity>5</quantity>
+              <product>http://products.myintranet.com/products/111</product>
+              ...
+
+        In that example, links embedded within the document allowed us to bring in additional
+        information as needed. Aggregation isn’t the full concept of HATEOAS, though. The
+        more interesting part of HATEOAS is the “engine.”
+
+        HATEOAS is a bit different because with each request returned from a server it tells you what new
+        interactions you can do next, as well as where to go to transition the state of your applications.
+
+        For example, let’s say we wanted to get a list of products available on a web store. We do
+        an HTTP GET on http://example.com/webstore/products and receive back:
+            <products>
+             <product id="123">
+             <name>headphones</name>
+             <price>$16.99</price>
+             </product>
+             <product id="124">
+             <name>USB Cable</name>
+             <price>$5.99</price>
+             </product>
+            ...
+            </products>
+        This could be problematic if we had thousands of products to send back to our client.
+        We might overload it, or the client might wait forever for the response to finish down‐
+        loading. We could instead list only the first five products and provide a link to get the
+        next set:
+            <products>
+             <link rel="next" href="http://example.com/store/products?startIndex=5"/>
+             <product id="123">
+             <name>headphones</name>
+             <price>$16.99</price>
+             </product>
+             ...
+            </products>
+
+        Following the next link could get them back a new document with additional links:
+            <products>
+             <link rel="previous" href="http://example.com/store/products?startIndex=0"/>
+             <link rel="next" href="http://example.com/webstore/products?startIndex=10"/>
+             <product id="128">
+             <name>stuff</name>
+             <price>$16.99</price>
+             </product>
+            ...
+            </products>
+
+===============================================================================================================
+CHAPTER 2 - Designing RESTful Services
+
+    So, let’s define a RESTful interface for a simple order entry
+    system of a hypothetical ecommerce web store. Remote distributed clients will use this
+    web service to purchase goods, modify existing orders in the system, and view infor‐
+    mation about customers and products.
+
+    To satisfy the addressability requirements of REST, we will first have to define a set of URIs that represent the
+    entry points into our system. Since RESTful systems are representation-oriented, we
+    will next define the data format that we will use to exchange information between our
+    services and clients. Finally, we will decide which HTTP methods are allowed by each
+    exposed URI and what those methods do. We will make sure to conform to the uniform,
+    constrained interface of HTTP when doing this step.
+
+
+    The object model
+        see the pic "1 - Object model - used in the examples from the book.png"
+
+
+!!! Model the URIs
+        The first thing we are going to do to create our distributed interface is define and name
+        each of the distributed endpoints in our system. In a RESTful system, endpoints are
+        usually referred to as resources and are identified using a URI. URIs satisfy the address‐
+        ability requirements of a RESTful service.
+
+        In our object model, we will be interacting with Orders, Customers, and Products.
+        These will be our main, top-level resources. We want to be able to obtain lists of each
+        of these top-level items and to interact with individual items. LineItems are aggregated
+        within Order objects so they will not be a top-level resource. We could expose them as
+        a subresource under one particular Order, but for now, let’s assume they are hidden by
+        the data format.
+
+        Given this, here is a list of URIs that will be exposed in our system:
+            /orders
+            /orders/{id}
+            /products
+            /products/{id}
+            /customers
+            /customers/{id}
+
+ !!!    You’ll notice that the nouns in our object model have been represented as URIs.
+        URIs shouldn’t be used as mini-RPC mechanisms and should not identify operations.
+        Instead, you should use a combination of HTTP methods and the data format to model unique opera‐
+        tions in your distributed RESTful system.
+
+
+    Defining the Data Format
+        One of the most important things we have to do when defining a RESTful interface is
+        determine how our resources will be represented over the wire to our clients. XML is
+        perhaps one of the most popular formats on the Web and can be processed by most
+        modern languages, so let’s choose that. JSON is also a popular format, as it is more
+        condensed and JavaScript can interpret it directly (great for Ajax applications), but let’s
+        stick to XML for now.
+
+        Generally, you would define an XML schema for each representation you want to send
+        across the wire. An XML schema defines the grammar of a data format. It defines the
+        rules about how a document can be put together.
+
+
+    Read and Update Format
+        Each format for Order, Customer, and Product will have a common XML element called link:
+            <link rel="self" href="http://example.com/..."/>
+        The link element tells any client that obtains an XML document describing one of the
+        objects in our ecommerce system where on the network the client can interact with that
+        particular resource. The rel attribute tells the client what relationship the link has with
+        the resource the URI points to (contained within the href attribute).
+
+        The self value just means it is pointing to itself. While not that interesting on its own, link becomes
+        very useful when we aggregate or compose information into one larger XML document.
+
+        So, with the common elements described, let’s start diving into the details by first looking
+        at our Customer representation format:
+            <customer id="117">
+             <link rel="self" href="http://example.com/customers/117"/>
+             <first-name>Bill</first-name>
+             <last-name>Burke</last-name>
+             <street>555 Beacon St.<street>
+             <city>Boston</city>
+             <state>MA</state>
+             <zip>02115</zip>
+            </customer>
+        Pretty straightforward. We just take the object model of Customer from Figure 2-1 (Object model printscreen)
+        and expand its attributes as XML elements.
+
+            <product id="543">
+             <link rel="self" href="http://example.com/products/543"/>
+             <name>iPhone</name>
+             <cost>$199.99</cost>
+            </product>
+
+            <order id="233">
+             <link rel="self" href="http://example.com/orders/233"/>
+             <total>$199.02</total>
+             <date>December 22, 2008 06:56</date>
+             <customer id="117">
+                <link rel="self" href="http://example.com/customers/117"/>
+                ...
+             </customer>
+             <line-items>
+                 <line-item id="144">
+                     <product id="543">
+                        <link rel="self" href="http://example.com/products/543"/>
+                        ...
+                     </product>
+                     <quantity>1</quantity>
+                 </line-item>
+              </line-items>
+             </order>
+
+        Order is a great example of data composition, as it includes Customer and Product information.
+        This is where the link element becomes particularly useful. If the client is interested in interacting with a
+        Customer or Product that makes up the Order, it has the URI needed to interact with
+        one of these resources.
+
+
+    Create Format
+        When we are creating new Orders, Customers, or Products, it doesn’t make a lot of
+        sense to include an id attribute and link element with our XML document. The server
+        will generate IDs when it inserts our new object into a database. We also don’t know the
+        URI of a new object because the server also generates this. So, the XML for creating a
+        new Product would look something like this:
+            <product>
+             <name>iPhone</name>
+             <cost>$199.99</cost>
+            </product>
+
+
+    Assigning HTTP Methods
+!!!!    The final thing we have to do is decide which HTTP methods will be exposed for each
+        of our resources and what these methods will do. It is crucial that we do not assign
+        functionality to an HTTP method that supersedes the specification-defined boundaries
+        of that method. For example, an HTTP GET on a particular resource should be readonly.
+        It should not change the state of the resource it is invoking on. Intermediate services
+        like a proxy-cache, a CDN (Akamai), or your browser rely on you to follow the semantics
+        of HTTP strictly so that they can perform built-in tasks like caching effectively
+
+
+    Browsing All Orders, Customers, or Products
+        The Order, Customer, and Product objects in our object model are all very similar in
+        how they are accessed and manipulated. One thing our remote clients will want to do
+        is to browse all the Orders, Customers, or Products in the system. These URIs represent
+        these objects as a group:
+            /orders
+            /products
+            /customers
+
+        To get a list of Orders, Products, or Customers, the remote client will call an HTTP
+        GET on the URI of the object group it is interested in
+        Our service will respond with a data format that represents all Orders, Products, or
+        Customers within our system
+
+            HTTP/1.1 200 OK
+            Content-Type: application/xml
+
+            <products>
+             <product id="111">
+             <link rel="self" href="http://example.com/products/111"/>
+             <name>iPhone</name>
+             <cost>$199.99</cost>
+             </product>
+             <product id="222">
+             <link rel="self" href="http://example.com/products/222"/>
+             <name>Macbook</name>
+             <cost>$1599.99</cost>
+             </product>
+            ...
+            </products>
+
+!!!!    One problem with this bulk operation is that we may have thousands of Orders, Customers, or
+        Products in our system and we may overload our client and hurt our response
+        times. To mitigate this problem, we will allow the client to specify query parameters on
+        the URI to limit the size of the dataset returned:
+
+            GET /orders?startIndex=0&size=5 HTTP/1.1
+
+ !!     Here we have defined two query parameters: startIndex and size. The startIndex
+        parameter represents where in our large list of Orders, Products, or Customers we want
+        to start sending objects from. It is a numeric index into the object group being queried.
+        The size parameter specifies how many of those objects in the list we want to return.
+        These parameters will be optional. The client does not have to specify them in its URI
+        when crafting its request to the server
+
+
+    Obtaining Individual Orders, Customers, or Products
+        I mentioned in the previous section that we would use a URI pattern to obtain individual
+        Orders, Customers, or Products:
+            /orders/{id}
+            /products/{id}
+            /customers/{id}
+        We will use the HTTP GET method to retrieve individual objects in our system. Each
+        GET invocation will return a data format that represents the object being obtained:
+            GET /orders/233 HTTP/1.1
+
+
+    Creating an Order, Customer, or Product
+        There are two possible ways in which a client could create an Order, Customer, or
+        Product within our order entry system: by using either the HTTP PUT or POST meth‐
+        od. Let’s look at both ways
+
+        Creating with PUT
+            The HTTP definition of PUT states that it can be used to create or update a resource
+            on the server. To create an Order, Customer, or Product with PUT, the client simply
+            sends a representation of the new object it is creating to the exact URI location that
+            represents the object:
+                PUT /orders/233 HTTP/1.1
+                PUT /customers/112 HTTP/1.1
+                PUT /products/664 HTTP/1.1
+            PUT is required by the specification to send a response code of 201, “Created,” if a new
+            resource was created on the server as a result of the request.
+
+            The HTTP specification also states that PUT is idempotent. Our PUT is idempotent,
+            because no matter how many times we tell the server to “create” our Order, the same
+            bits are stored at the /orders/233 location
+
+  !!!!      The disadvantage of using PUT to create resources is that the client has to provide the
+            unique ID that represents the object it is creating. While it usually possible for the client
+            to generate this unique ID, most application designers prefer that their servers (usually
+            through their databases) create this ID. In our hypothetical order entry system, we want
+            our server to control the generation of resource IDs. So what do we do? We can switch
+            to using POST instead of PUT.
+
+    Creating with POST
+        Creating an Order, Customer, or Product using the POST method is a little more com‐
+        plex than using PUT. To create an Order, Customer, or Product with POST, the client
+        sends a representation of the new object it is creating to the parent URI of its represen‐
+        tation, leaving out the numeric target ID. For example:
+            POST /orders HTTP/1.1
+            Content-Type: application/xml
+            <order>
+             <total>$199.02</total>
+             <date>December 22, 2008 06:56</date>
+            ...
+            </order>
+        The service receives the POST message, processes the XML, and creates a new order in
+        the database using a database-generated unique ID. While this approach works perfectly
+        fine, we’ve left our client in a quandary. What if the client wants to edit, update, or cancel
+        the order it just posted? What is the ID of the new order? What URI can we use to
+        interact with the new resource? To resolve this issue, we will add a bit of information to
+        the HTTP response message
+
+        The client would receive a message something like this:
+            HTTP/1.1 201 Created
+            Content-Type: application/xml
+            Location: http://example.com/orders/233
+            <order id="233">
+             <link rel="self" href="http://example.com/orders/233"/>
+             <total>$199.02</total>
+             <date>December 22, 2008 06:56</date>
+            ...
+            </order>
+
+  !!!   HTTP requires that if POST creates a new resource, it respond with a code of 201,
+        “Created” (just like PUT). The Location header in the response message provides a URI
+        to the client so it knows where to further interact with the Order that was created (i.e.,
+        if the client wanted to update the Order). It is optional whether the server sends the
+        representation of the newly created Order with the response. Here, we send back an
+        XML representation of the Order that was just created with the ID attribute set to the
+        one generated by our database as well as a link element.
+
+
+    Updating an Order, Customer, or Product
+        We will model updating an Order, Customer, or Product using the HTTP PUT method.
+        The client PUTs a new representation of the object it is updating to the exact URI location
+        that represents the object
+
+        When a resource is updated with PUT, the HTTP specification requires that you send
+        a response code of 200, “OK,” and a response message body or a response code of 204,
+        “No Content,” without any response body. In our system, we will send a status of 204
+        and no response message.
+
+
+    Removing an Order, Customer, or Product
+!!!!    We will model deleting an Order, Customer, or Product using the HTTP DELETE
+        method. The client simply invokes the DELETE method on the exact URI that represents
+        the object we want to remove. Removing an object will wipe its existence from the system.
+
+        When a resource is removed with DELETE, the HTTP specification requires that you
+        send a response code of 200, “OK,” and a response message body or a response code of
+        204, “No Content,” without any response body. In our application, we will send a status
+        of 204 and no response message.
+
+
+    Cancelling an Order
+!!!     So far, the operations of our object model have fit quite nicely into corresponding HTTP
+        methods. We’re using GET for reading, PUT for updating, POST for creating, and
+        DELETE for removing. We do have an operation in our object model that doesn’t fit so
+        nicely. In our system, Orders can be cancelled as well as removed. While removing an
+        object wipes it clean from our databases, cancelling only changes the state of the Order
+        and retains it within the system. How should we model such an operation?
+ !!!    Overloading the meaning of DELETE
+
+        Cancelling an Order is very similar to removing it. Since we are already modeling re‐
+        move with the HTTP DELETE method, one thing we could do is add an extra query
+        parameter to the request:
+            DELETE /orders/233?cancel=true
+
+        Here, the cancel query parameter would tell our service that we don’t really want to
+        remove the Order, but cancel it. In other words, we are overloading the meaning of DELETE.
+
+ !!!!   While I’m not going to tell you not to do this, I will tell you that you shouldn’t do it. It
+        is not good RESTful design. In this case, you are changing the meaning of the uniform
+        interface. Using a query parameter in this way is actually creating a mini-RPC mecha‐
+        nism. HTTP specifically states that DELETE is used to delete a resource from the server,
+        not cancel it
+
+    States versus operations
+        When modeling a RESTful interface for the operations of your object model, you should
+        ask yourself a simple question: is the operation a state of the resource? If you answer
+        yes to this question, the operation should be modeled within the data format.
+        Cancelling an Order is a perfect example of this. The key with cancelling is that it is a
+        specific state of an Order. When a client follows a particular URI that links to a specific
+        Order, the client will want to know whether the Order was cancelled or not.
+
+        Information about the cancellation needs to be in the data format of the Order.
+        So let’s add a cancelled element to our Order data format:
+            <order id="233">
+             <link rel="self" href="http://example.com/orders/233"/>
+             <total>$199.02</total>
+             <date>December 22, 2008 06:56</date>
+             <cancelled>false</cancelled>
+            ...
+            </order>
+        Since the state of being cancelled is modeled in the data format, we can now use our
+        already defined mechanism of updating an Order to model the cancel operation. For
+        example, we could PUT this message to our service
+
+ !!!!   This pattern of modeling an operation as the state of the resource doesn’t always fit,
+        though. What if we expanded on our cancel example by saying that we wanted a way to
+        clean up all cancelled orders? In other words, we want to purge all cancelled orders from
+        our database. We can’t really model purging the same way we did cancel. While purge
+        does change the state of our application, it is not in and of itself a state of the application.
+        To solve this problem, we model this operation as a subresource of /orders and we
+        trigger a purging by doing a POST on that resource. For example:
+            POST /orders/purge HTTP/1.1
+
+
+    Wrapping Up
+        So, we’ve taken an existing object diagram and modeled it as a RESTful distributed
+        service. We used URIs to represent the endpoints in our system. These endpoints are
+        called resources. For each resource, we defined which HTTP methods each resource
+        will allow and how those individual HTTP methods behave. Finally, we defined the data
+        format that our clients and services will use to exchange information. The next step is
+        to actually implement these services in Java. This will be the main topic for the rest of
+        this book
+
+===============================================================================================================
+CHAPTER 3 - Your First JAX-RS Service
+
+!!  Writing RESTful services in Java has been possible for years with the servlet API. If you
+    have written a web application in Java, you are probably already very familiar with
+    servlets. Servlets bring you very close to the HTTP protocol and require a lot of boil‐
+    erplate code to move information to and from an HTTP request. In 2008, a new spec‐
+    ification called JAX-RS was defined to simplify RESTful service implementation.
+
+    JAX-RS is a framework that focuses on applying Java annotations to plain Java objects.
+    It has annotations to bind specific URI patterns and HTTP operations to individual
+    methods of your Java class. It has parameter injection annotations so that you can easily
+    pull in information from the HTTP request. It has message body readers and writers
+    that allow you to decouple data format marshalling and unmarshalling from your Java
+    data objects. It has exception mappers that can map an application-thrown exception
+    to an HTTP response code and message. Finally, it has some nice facilities for HTTP
+    content negotiation
+
+
+    Developing a JAX-RS RESTful Service
+        TODO Continue with the code examples from here...you can leave the existing api for testing pursposes, and add
+        the new code in a new package..
+
+
+
+===============================================================================================================
+CHAPTER 2 - Designing RESTful Services
+
+
+
+
+
+
+
+TODO SEARCH FOR "5. HATEOAS" in this document and try to create a simple example like the one mentioned there..with products and prev and next links
