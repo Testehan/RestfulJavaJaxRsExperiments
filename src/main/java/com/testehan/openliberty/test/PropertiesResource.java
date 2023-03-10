@@ -1,4 +1,4 @@
-package com.testehan.openliberty.rest;
+package com.testehan.openliberty.test;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
