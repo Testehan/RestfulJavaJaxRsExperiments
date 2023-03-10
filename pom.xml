@@ -17,6 +17,8 @@
         <liberty.var.app.context.root>RestfulJavaJaxRsExperiments</liberty.var.app.context.root>
         <liberty.var.default.http.port>9080</liberty.var.default.http.port>
         <liberty.var.default.https.port>9443</liberty.var.default.https.port>
+
+        <version.org.jboss.resteasy>6.0.0.Final</version.org.jboss.resteasy>
     </properties>
 
     <build>
@@ -50,6 +52,47 @@
             <type>pom</type>
             <scope>provided</scope>
         </dependency>
+
+        <!-- For MainServiceClients and tests -->
+        <!-- helped by : http://www.mastertheboss.com/jboss-frameworks/resteasy/resteasy-client-example/-->
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-core</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-client</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jackson2-provider</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+            <scope>test</scope>
+        </dependency>
+        <!--
+            JBoss RESTEasy is broken up into a bunch of smaller JARs so that you can pick and
+            choose which features of RESTEasy to use. Because of this, the core RESTEasy JAR file
+            does not have the JAXB content handlers. This is only needed in test classes, as the openliberty server
+            provides a JAXB implementation, hence the "test" scope
+         -->
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxb-provider</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.9.0</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
-    
+
 </project>
