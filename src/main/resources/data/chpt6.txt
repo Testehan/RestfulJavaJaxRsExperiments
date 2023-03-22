@@ -1,0 +1,4 @@
+I am a file
+that will be
+returned as InputStream
+after a method is called.

@@ -2,6 +2,7 @@
 
     <featureManager>
         <feature>restfulWS-3.0</feature>
+        <feature>xmlBinding-3.0</feature>
         <feature>jsonp-2.0</feature>
         <feature>jsonb-2.0</feature>
     </featureManager>
