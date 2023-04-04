@@ -5,6 +5,8 @@ import com.testehan.openliberty.chpt5.CarResource;
 import com.testehan.openliberty.chpt6.Chpt6Service;
 import com.testehan.openliberty.chpt7.Chpt7Service;
 import com.testehan.openliberty.chpt7.IllegalArgumentExceptionMapper;
+import com.testehan.openliberty.chpt9.Chpt9CustomerResource;
+import com.testehan.openliberty.chpt9.Chpt9MyService;
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 
@@ -22,7 +24,14 @@ public class ShoppingApplication extends Application {
         instancePerRequest.add(CarResource.class);
         instancePerRequest.add(Chpt6Service.class);
         instancePerRequest.add(Chpt7Service.class);
-        instancePerRequest.add(IllegalArgumentExceptionMapper.class);
+        instancePerRequest.add(Chpt9CustomerResource.class);
+        instancePerRequest.add(Chpt9MyService.class);
+        instancePerRequest.add(Cpt10LinkService.class);
+        instancePerRequest.add(CustomersService.class);
+        instancePerRequest.add(Chpt11CustomerResource.class);
+        instancePerRequest.add(Chpt12CustomerResource.class);
+        instancePerRequest.add(Chpt13CustomerResource.class);
+        instancePerRequest.add(Chpt14Resource.class);
     }
 
     @Override
