@@ -10,7 +10,9 @@ import com.testehan.openliberty.chpt9.Chpt9MyService;
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @ApplicationPath("/services")
@@ -32,6 +34,7 @@ public class ShoppingApplication extends Application {
         instancePerRequest.add(Chpt12CustomerResource.class);
         instancePerRequest.add(Chpt13CustomerResource.class);
         instancePerRequest.add(Chpt14Resource.class);
+        instancePerRequest.add(Chpt15Resource.class);
     }
 
     @Override
@@ -44,5 +47,13 @@ public class ShoppingApplication extends Application {
     @Override
     public Set<Object> getSingletons() {
         return singletons;
+    }
+
+    private Map<String,String> getInitialUsers(){
+        Map<String,String> userSecretMap = new HashMap<>();
+        userSecretMap.put("dan","password");
+        userSecretMap.put("mihai","ciuciu");
+
+        return userSecretMap;
     }
 }

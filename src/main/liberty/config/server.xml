@@ -5,6 +5,9 @@
         <feature>xmlBinding-3.0</feature>
         <feature>jsonp-2.0</feature>
         <feature>jsonb-2.0</feature>
+
+        <!--TODO  THIS did not help.. WILL NEED to check after getting to the exercises part of chapter 15-->
+        <feature>wsSecurity-1.1</feature>
     </featureManager>
 
     <httpEndpoint httpPort="${default.http.port}" httpsPort="${default.https.port}"
