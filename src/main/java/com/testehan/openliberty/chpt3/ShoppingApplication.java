@@ -1,5 +1,20 @@
 package com.testehan.openliberty.chpt3;
 
+import com.testehan.openliberty.chpt10.Cpt10LinkService;
+import com.testehan.openliberty.chpt10.CustomersService;
+import com.testehan.openliberty.chpt11.Chpt11CustomerResource;
+import com.testehan.openliberty.chpt12.BearerTokenFilter;
+import com.testehan.openliberty.chpt12.CacheControlFilter;
+import com.testehan.openliberty.chpt12.Chpt12CustomerResource;
+import com.testehan.openliberty.chpt12.HttpMethodOverride;
+import com.testehan.openliberty.chpt12.maxage.MaxAgeFeature;
+import com.testehan.openliberty.chpt13.Chpt13CustomerResource;
+import com.testehan.openliberty.chpt13.PriorityScheduling;
+import com.testehan.openliberty.chpt13.chat.ChatServer;
+import com.testehan.openliberty.chpt14.Chpt14Resource;
+import com.testehan.openliberty.chpt15.Chpt15Resource;
+import com.testehan.openliberty.chpt15.allowedPerDay.PerDayAuthorizer;
+import com.testehan.openliberty.chpt15.onetimepassword.OneTimePasswordAuthenticator;
 import com.testehan.openliberty.chpt4.CustomerDatabaseResource;
 import com.testehan.openliberty.chpt5.CarResource;
 import com.testehan.openliberty.chpt6.Chpt6Service;
