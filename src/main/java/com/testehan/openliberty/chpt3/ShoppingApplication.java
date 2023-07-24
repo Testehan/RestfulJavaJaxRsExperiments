@@ -37,6 +37,16 @@ public class ShoppingApplication extends Application {
 
     public ShoppingApplication() {
         singletons.add(new CustomerResourceService());
+        singletons.add(new IllegalArgumentExceptionMapper());
+        singletons.add(new HttpMethodOverride());
+        singletons.add(new BearerTokenFilter());
+        singletons.add(new CacheControlFilter());
+        singletons.add(new MaxAgeFeature());
+        singletons.add(new PriorityScheduling());
+        singletons.add(new ChatServer());
+        singletons.add(new OneTimePasswordAuthenticator(getInitialUsers()));
+        singletons.add(new PerDayAuthorizer());
+
         instancePerRequest.add(CustomerDatabaseResource.class);
         instancePerRequest.add(CarResource.class);
         instancePerRequest.add(Chpt6Service.class);
